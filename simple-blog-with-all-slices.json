@@ -1,0 +1,275 @@
+{
+  "id": "aIp6MhIAACwAfHqz",
+  "uid": "simple",
+  "url": "/blog/simple",
+  "type": "blog",
+  "href": "https://massive-prismic.cdn.prismic.io/api/v2/documents/search?ref=aIs6iBIAACwAfZqK&q=%5B%5B%3Ad+%3D+at%28document.id%2C+%22aIp6MhIAACwAfHqz%22%29+%5D%5D",
+  "tags": [],
+  "first_publication_date": "2025-07-30T20:02:16+0000",
+  "last_publication_date": "2025-07-31T09:42:32+0000",
+  "slugs": ["heading-1paragraph"],
+  "linked_documents": [],
+  "lang": "nl-nl",
+  "alternate_languages": [],
+  "data": {
+    "heading": "Main heading",
+    "updated_at": "2025-07-10",
+    "author": "Guido van der Reijden",
+    "reading_time": 8,
+    "slices": [
+      {
+        "variation": "default",
+        "version": "initial",
+        "items": [],
+        "primary": {
+          "content": [
+            {
+              "type": "heading1",
+              "text": "heading 1paragraph",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "paragraph",
+              "text": "paragraph",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "heading2",
+              "text": "heading 2 paragraph with link",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "paragraph",
+              "text": "paragraph with a link to massive",
+              "spans": [
+                {
+                  "start": 25,
+                  "end": 32,
+                  "type": "hyperlink",
+                  "data": {
+                    "link_type": "Web",
+                    "url": "www.massiveonlinemarketing.nl",
+                    "target": "_self"
+                  }
+                }
+              ],
+              "direction": "ltr"
+            },
+            {
+              "type": "heading3",
+              "text": "heading 3 bullet list ",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "list-item",
+              "text": "bullet point 1 ",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "list-item",
+              "text": "bullet point 2",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "paragraph",
+              "text": "",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "heading3",
+              "text": "heading 3 numbered list",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "o-list-item",
+              "text": "numbered list 1",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "o-list-item",
+              "text": "numbered list 2",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "paragraph",
+              "text": "",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "heading4",
+              "text": "heading 4 with wich paragraph",
+              "spans": [],
+              "direction": "ltr"
+            },
+            {
+              "type": "paragraph",
+              "text": "hallo dit woord is bold en deze is cursief",
+              "spans": [
+                { "start": 19, "end": 23, "type": "strong" },
+                { "start": 35, "end": 42, "type": "em" }
+              ],
+              "direction": "ltr"
+            }
+          ],
+          "show_divider": true
+        },
+        "id": "typography$c047d568-5e17-4c56-8774-abcc8d6917ca",
+        "slice_type": "typography",
+        "slice_label": null
+      },
+      {
+        "variation": "default",
+        "version": "initial",
+        "items": [],
+        "primary": {
+          "blog_post": {
+            "id": "aGJRmRMAACwAF5Kc",
+            "type": "blog",
+            "tags": ["Blog", "SEO"],
+            "lang": "nl-nl",
+            "slug": "waarom-zoekwoorden-onmisbaar-zijn",
+            "first_publication_date": "2025-06-30T08:58:32+0000",
+            "last_publication_date": "2025-06-30T09:43:31+0000",
+            "uid": "wat-is-een-zoekwoord",
+            "url": "/blog/wat-is-een-zoekwoord",
+            "link_type": "Document",
+            "key": "f93d1cab-16f9-48a7-8e1b-12710a3ebb4b",
+            "isBroken": false,
+            "text": "dit is een blog link"
+          }
+        },
+        "id": "blog_link$d8bfba32-7ae4-41dc-9a08-2bc436017e4b",
+        "slice_type": "blog_link",
+        "slice_label": null
+      },
+      {
+        "variation": "default",
+        "version": "initial",
+        "items": [],
+        "primary": {
+          "accordion_item": [
+            {
+              "title": "accordion title 1",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "text": "accordion rich text body ",
+                  "spans": [],
+                  "direction": "ltr"
+                }
+              ]
+            }
+          ]
+        },
+        "id": "accordion$336ce64b-0096-49a8-8e6e-8d3d84578b34",
+        "slice_type": "accordion",
+        "slice_label": null
+      },
+      {
+        "variation": "default",
+        "version": "initial",
+        "items": [],
+        "primary": {
+          "custom_marker": false,
+          "pros_title": "Dit zijn de pros",
+          "pros": [{ "title": "pro 1" }, { "title": "pro 2" }],
+          "cons_title": "Dit zijn de cons",
+          "cons": [{ "title": "con 1" }, { "title": "con 2" }]
+        },
+        "id": "pros_cons$48c983b1-5456-4bb2-94b3-b18e559cef8b",
+        "slice_type": "pros_cons",
+        "slice_label": null
+      },
+      {
+        "variation": "default",
+        "version": "initial",
+        "items": [],
+        "primary": {
+          "bold_text": "notification default",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "content voor default notification",
+              "spans": [],
+              "direction": "ltr"
+            }
+          ]
+        },
+        "id": "notification$b9a68e53-5597-44a9-adba-d2287685f468",
+        "slice_type": "notification",
+        "slice_label": null
+      },
+      {
+        "variation": "base100",
+        "version": "initial",
+        "items": [],
+        "primary": {
+          "bold_text": "notification base",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "content voor base notification",
+              "spans": [],
+              "direction": "ltr"
+            }
+          ]
+        },
+        "id": "notification$68429dad-04be-4257-8b8b-5f6c32743d3e",
+        "slice_type": "notification",
+        "slice_label": null
+      },
+      {
+        "variation": "purple",
+        "version": "initial",
+        "items": [],
+        "primary": {
+          "bold_text": "notification pruple",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "content voor purple notification",
+              "spans": [],
+              "direction": "ltr"
+            }
+          ]
+        },
+        "id": "notification$a0b108c7-f00e-48d6-b465-5d6baa389b75",
+        "slice_type": "notification",
+        "slice_label": null
+      },
+      {
+        "variation": "orange",
+        "version": "initial",
+        "items": [],
+        "primary": {
+          "bold_text": "notification orange",
+          "content": [
+            {
+              "type": "paragraph",
+              "text": "content voor orange notification",
+              "spans": [],
+              "direction": "ltr"
+            }
+          ]
+        },
+        "id": "notification$426d2add-7cf8-4c8a-b2b0-82379f1ada8b",
+        "slice_type": "notification",
+        "slice_label": null
+      }
+    ],
+    "meta_title": null,
+    "meta_description": null,
+    "meta_image": {}
+  }
+}

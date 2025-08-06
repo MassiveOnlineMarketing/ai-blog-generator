@@ -1,0 +1,345 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== TOPICAL MAPPING MODELS =====
+
+model TopicalMap {
+  id               String   @id @default(uuid())
+  name             String
+  sourceEbookTitle String?
+  websiteDomain    String?
+  status           String   @default("draft") // draft, processing, completed
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relationships
+  entries        TopicalMapEntry[]
+  visualizations ClusterVisualization[]
+
+  @@map("topical_maps")
+}
+
+model TopicalMapEntry {
+  id            String  @id @default(uuid())
+  topicalMapId  String
+  categorie     String // e.g., "Technical SEO", "Content SEO"
+  type          String // P (Pillar), C (Cluster), S (Support)
+  titelPagina   String
+  urlPagina     String // URL slug for the entry
+  kernonderwerp String? // Description of core topic
+  inhoudsopgave String? // Table of contents for the entry
+  sammenvatting String? // Summary of the entry
+
+  // Keywords (JSON arrays)
+  belangrijksteZoekwoorden String[] // Primary keywords
+  longTailIdeeen           String[] // Long-tail keyword ideas
+
+  // Linking strategy (JSON arrays)
+  linktNaarPillar    String[] // Links to pillar pages
+  linktNaarCluster   String[] // Links to cluster content
+  linktNaarSupport   String[] // Links to support content
+  linktNaarTools     String[] // Links to tools/case studies
+  linktNaarBestaande String[] // Links to existing website pages
+
+  // Content management
+  contentStatus      String  @default("planned") // planned, in_progress, generated, published
+  contentUid         String? // Prismic UID when published
+  priority           Int     @default(3) // 1-5 priority scale
+  estimatedWordCount Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  topicalMap                 TopicalMap                   @relation(fields: [topicalMapId], references: [id], onDelete: Cascade)
+  contentDuplicationAnalysis ContentDuplicationAnalysis[]
+  generatedContent           GeneratedContent[]
+
+  @@index([topicalMapId, type])
+  @@index([contentStatus])
+  @@index([priority])
+  @@map("topical_map_entries")
+}
+
+// ===== WEBSITE CONTENT MODELS =====
+
+model WebsiteContent {
+  id          String  @id @default(uuid())
+  url         String  @unique
+  title       String?
+  description String?
+  content     String? // Extracted text content
+  contentType String? // page, blog, product, service, etc.
+  category    String? // AI-categorized content type
+  summary     String? // AI-generated summary
+
+  // SEO data
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String[]
+
+  // Content analysis
+  wordCount   Int?
+  readingTime Int? // in minutes
+  mainTopics  String[] // AI-extracted topics
+
+  // Discovery metadata
+  discoveredVia String? // sitemap, internal_link, manual
+  lastCrawled   DateTime @default(now())
+  crawlStatus   String   @default("pending") // pending, success, failed
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  searchConsoleQueries SearchConsoleQuery[]
+
+  @@index([contentType])
+  @@index([category])
+  @@index([lastCrawled])
+  @@map("website_content")
+}
+
+// ===== SEARCH CONSOLE MODELS =====
+
+model SearchConsoleQuery {
+  id      String @id @default(uuid())
+  pageUrl String
+  query   String
+
+  // Performance metrics
+  clicks      Int
+  impressions Int
+  position    Float
+  ctr         Float
+
+  // Date range
+  dateRangeStart DateTime
+  dateRangeEnd   DateTime
+
+  // Analysis
+  searchIntent   String? // informational, commercial, transactional, navigational
+  keywordType    String? // head, mid_tail, long_tail
+  relevanceScore Float? // 0-1 calculated relevance
+
+  createdAt DateTime @default(now())
+
+  // Relationships
+  websiteContent WebsiteContent? @relation(fields: [pageUrl], references: [url])
+
+  @@index([pageUrl])
+  @@index([query])
+  @@index([dateRangeStart, dateRangeEnd])
+  @@map("search_console_queries")
+}
+
+// ===== KEYWORD RESEARCH MODELS =====
+
+model KeywordResearch {
+  id          String @id @default(uuid())
+  seedKeyword String
+
+  // Research results
+  suggestions  String[] // All keyword suggestions
+  totalResults Int
+
+  // API metadata
+  source         String // google_ads, search_console, manual
+  quotaUsed      Int?
+  processingTime Int? // milliseconds
+
+  createdAt DateTime @default(now())
+
+  // Relationships
+  keywords Keyword[]
+
+  @@index([seedKeyword])
+  @@index([source])
+  @@map("keyword_research")
+}
+
+model Keyword {
+  id      String @id @default(uuid())
+  keyword String @unique
+
+  // Google Ads data
+  volume           Int? // Monthly search volume
+  competition      String? // LOW, MEDIUM, HIGH
+  competitionIndex Float? // 0-1 scale
+  cpc              Float? // Cost per click
+  trend            Float[] // 12 months trend data
+
+  // Analysis
+  difficulty     Int? // 1-100 difficulty score
+  relevanceScore Float? // 0-1 relevance to content
+  assignedType   String? // P, C, S (which content type it's assigned to)
+
+  // Relationships
+  relatedKeywords String[] // Related keyword suggestions
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  keywordResearch   KeywordResearch? @relation(fields: [keywordResearchId], references: [id])
+  keywordResearchId String?
+
+  @@index([volume])
+  @@index([competition])
+  @@index([assignedType])
+  @@map("keywords")
+}
+
+// ===== CONTENT ANALYSIS MODELS =====
+
+model ContentDuplicationAnalysis {
+  id                   String  @id @default(uuid())
+  topicalMapEntryId    String
+  existingPageUrl      String
+  existingPageTitle    String?
+  proposedContentTitle String
+
+  // Similarity analysis
+  similarityScore Float // 0-1 scale
+  riskLevel       String // low, medium, high
+  overlapAreas    Json // Detailed overlap analysis
+
+  // Optimization suggestions
+  optimizationSuggestions Json // Structured suggestions
+  resolutionStatus        String @default("pending") // pending, resolved, ignored
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  topicalMapEntry TopicalMapEntry @relation(fields: [topicalMapEntryId], references: [id], onDelete: Cascade)
+
+  @@index([topicalMapEntryId])
+  @@index([riskLevel])
+  @@index([resolutionStatus])
+  @@map("content_duplication_analysis")
+}
+
+// ===== CONTENT GENERATION MODELS =====
+
+model GeneratedContent {
+  id                String @id @default(uuid())
+  topicalMapEntryId String
+
+  // Content data
+  title       String
+  content     Json // Complete blog content with slices
+  wordCount   Int
+  readingTime Int // in minutes
+
+  // SEO data
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String[]
+  targetKeywords  String[] // Primary keywords for this content
+
+  // Generation metadata
+  aiModel        String // gpt-4, gpt-4-turbo, etc.
+  promptVersion  String // Version of prompt used
+  generationTime Int // milliseconds
+  qualityScore   Float? // 0-1 content quality score
+
+  // Pipeline status tracking
+  validationStatus  String @default("pending") // pending, valid, fixed, failed
+  publicationStatus String @default("pending") // pending, published, failed
+
+  // Publication
+  prismicUid    String? // Prismic document UID
+  prismicId     String? // Prismic document ID
+  publishStatus String    @default("draft") // draft, published, archived
+  publishedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  topicalMapEntry TopicalMapEntry @relation(fields: [topicalMapEntryId], references: [id], onDelete: Cascade)
+
+  @@unique([topicalMapEntryId, prismicUid])
+  @@index([publishStatus])
+  @@index([publishedAt])
+  @@index([validationStatus])
+  @@index([publicationStatus])
+  @@map("generated_content")
+}
+
+// ===== VISUALIZATION MODELS =====
+
+model ClusterVisualization {
+  id           String @id @default(uuid())
+  topicalMapId String
+
+  // Visualization data
+  visualizationData Json // Complete D3.js/visualization JSON
+  layoutType        String // hierarchy, network, force_directed
+
+  // Metadata
+  nodeCount   Int
+  edgeCount   Int
+  generatedAt DateTime @default(now())
+
+  // Relationships
+  topicalMap TopicalMap @relation(fields: [topicalMapId], references: [id], onDelete: Cascade)
+
+  @@index([topicalMapId])
+  @@index([layoutType])
+  @@map("cluster_visualizations")
+}
+
+// ===== SYSTEM MODELS =====
+
+model ApiUsage {
+  id        String @id @default(uuid())
+  service   String // openai, google_ads, search_console
+  operation String // generate_content, research_keywords, etc.
+
+  // Usage data
+  requestCount Int    @default(1)
+  tokensUsed   Int? // For OpenAI
+  quotaUsed    Int? // For Google APIs
+  cost         Float? // Estimated cost
+
+  // Performance
+  responseTime Int // milliseconds
+  success      Boolean @default(true)
+  errorMessage String?
+
+  date DateTime @default(now())
+
+  @@index([service, date])
+  @@index([operation, date])
+  @@map("api_usage")
+}
+
+model SystemLog {
+  id        String  @id @default(uuid())
+  level     String // debug, info, warn, error
+  message   String
+  module    String // topical-mapping, keyword-research, etc.
+  operation String?
+  metadata  Json?
+
+  timestamp DateTime @default(now())
+
+  @@index([level, timestamp])
+  @@index([module, timestamp])
+  @@map("system_logs")
+}
