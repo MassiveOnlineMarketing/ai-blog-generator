@@ -1,0 +1,108 @@
+#!/usr/bin/env tsx
+
+import { MarkdownToPrismicParser } from "src/shared";
+
+
+/**
+ * Test script for the markdown parser to verify blog-link parsing
+ */
+function testMarkdownParser() {
+  const parser = new MarkdownToPrismicParser();
+
+  // Test markdown with blog-link slice
+  const testMarkdown = `
+# Test Blog Post
+
+Dit is een introductie paragraaf met wat tekst.
+
+## Sectie 1
+
+Hier is wat content met een **vetgedrukte** tekst en een [externe link](https://example.com).
+
+Voor meer informatie over dit onderwerp, lees ook:
+:::blog-link:/blog/doelgroep-begrijpen-en-personas-creeren
+Doelgroep begrijpen en persona's creëren
+:::
+
+### Subsectie met lijst
+
+- Bullet point 1
+- Bullet point 2
+- Bullet point 3
+
+En ook een genummerde lijst:
+
+1. Eerste item
+2. Tweede item
+3. Derde item
+
+:::notification:default
+**Belangrijke Tip:** Test tip content
+
+Dit is de inhoud van de notification.
+:::
+
+## Conclusie
+
+Dit is de conclusie van de blog post.
+`.trim();
+
+  console.log('🧪 Testing markdown parser...\n');
+  
+  const slices = parser.parseMarkdownToSlices(testMarkdown);
+  
+  console.log(`✅ Parsed ${slices.length} slices:`);
+  
+  slices.forEach((slice, index) => {
+    console.log(`${index + 1}. ${slice.slice_type} (${slice.variation})`);
+    
+    if (slice.slice_type === 'blog_link') {
+      console.log(`   Blog link:`, slice.primary.blog_post);
+    } else if (slice.slice_type === 'typography') {
+      const content = slice.primary.content;
+      console.log(`   Content blocks: ${content.length}`);
+      content.forEach((block: any, i: number) => {
+        console.log(`     ${i + 1}. ${block.type}: "${block.text?.substring(0, 50)}..."`);
+      });
+    } else if (slice.slice_type === 'notification') {
+      console.log(`   Bold text: "${slice.primary.bold_text}"`);
+      console.log(`   Content blocks: ${slice.primary.content.length}`);
+    }
+  });
+
+  // Test specifically for blog-link parsing
+  const blogLinkSlice = slices.find(slice => slice.slice_type === 'blog_link');
+  if (blogLinkSlice) {
+    console.log('\n✅ Blog link slice found:');
+    console.log(JSON.stringify(blogLinkSlice, null, 2));
+  } else {
+    console.log('\n❌ No blog link slice found!');
+  }
+
+  // Check for lists in typography slices
+  const typographySlices = slices.filter(slice => slice.slice_type === 'typography');
+  let foundLists = false;
+  
+  typographySlices.forEach(slice => {
+    slice.primary.content.forEach((block: any) => {
+      if (block.type === 'list-item' || block.type === 'o-list-item') {
+        foundLists = true;
+        console.log(`\n✅ Found ${block.type}: "${block.text}"`);
+      }
+    });
+  });
+
+  if (!foundLists) {
+    console.log('\n❌ No list items found in typography slices!');
+  }
+
+  console.log('\n🎉 Test completed!');
+}
+
+// Run the test if this file is executed directly
+if (require.main === module) {
+  testMarkdownParser();
+}
+
+export { testMarkdownParser };
+

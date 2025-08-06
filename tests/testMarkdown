@@ -1,0 +1,87 @@
+#!/usr/bin/env tsx
+
+import { MarkdownToPrismicParser } from "src/shared";
+
+
+/**
+ * Test script for the updated markdown parser with blog-link support
+ */
+function testBlogLinkParsing() {
+  console.log('🧪 Testing blog-link parsing...\n');
+
+  const parser = new MarkdownToPrismicParser();
+
+  // Test case 1: Basic blog-link conversion
+  const testMarkdown1 = `
+# Test Heading
+
+Meer weten over doelgroepanalyse en persona's? Lees:
+:::blog-link:/blog/doelgroep-begrijpen-en-personas-creeren
+Doelgroep begrijpen en persona's creëren
+:::
+
+Dit is een normale paragraaf na de link.
+`;
+
+  console.log('1️⃣ Testing basic blog-link conversion...');
+  const result1 = parser.parseMarkdownToSlices(testMarkdown1);
+  
+  console.log(`Generated ${result1.length} slices:`);
+  result1.forEach((slice, index) => {
+    console.log(`   Slice ${index + 1}: ${slice.slice_type} (${slice.variation})`);
+    if (slice.slice_type === 'typography' && slice.primary.content) {
+      const content = slice.primary.content;
+      content.forEach((item: any, itemIndex: number) => {
+        console.log(`     Content ${itemIndex + 1}: ${item.type} - "${item.text}"`);
+        if (item.spans && item.spans.length > 0) {
+          item.spans.forEach((span: any, spanIndex: number) => {
+            console.log(`       Span ${spanIndex + 1}: ${span.type} (${span.start}-${span.end}) -> ${span.data?.url || 'no url'}`);
+          });
+        }
+      });
+    }
+  });
+
+  // Test case 2: Multiple links in one paragraph
+  const testMarkdown2 = `
+Bekijk onze gerelateerde artikelen:
+:::blog-link:/blog/artikel-1
+Eerste artikel
+:::
+en
+:::blog-link:/blog/artikel-2
+Tweede artikel
+:::
+voor meer informatie.
+`;
+
+  console.log('\n2️⃣ Testing multiple blog-links in one paragraph...');
+  const result2 = parser.parseMarkdownToSlices(testMarkdown2);
+  
+  console.log(`Generated ${result2.length} slices:`);
+  result2.forEach((slice, index) => {
+    console.log(`   Slice ${index + 1}: ${slice.slice_type}`);
+    if (slice.slice_type === 'typography' && slice.primary.content) {
+      const content = slice.primary.content;
+      content.forEach((item: any, itemIndex: number) => {
+        console.log(`     Content ${itemIndex + 1}: ${item.type} - "${item.text}"`);
+        if (item.spans && item.spans.length > 0) {
+          console.log(`     Found ${item.spans.length} hyperlinks:`);
+          item.spans.forEach((span: any, spanIndex: number) => {
+            console.log(`       Link ${spanIndex + 1}: "${item.text.substring(span.start, span.end)}" -> ${span.data?.url}`);
+          });
+        }
+      });
+    }
+  });
+
+  console.log('\n✅ Blog-link parsing tests completed!');
+}
+
+// Run the test if this file is executed directly
+if (require.main === module) {
+  testBlogLinkParsing();
+}
+
+export { testBlogLinkParsing };
+
